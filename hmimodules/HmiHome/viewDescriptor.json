@@ -1,0 +1,12 @@
+{
+    "views": [
+        {
+            "id": "HomeMain",
+            "file": "HmiHome/HomeMain.qml"
+        },
+        {
+            "id": "HomeGrid",
+            "file": "HmiHome/HomeGrid.qml"
+        }
+    ]
+}

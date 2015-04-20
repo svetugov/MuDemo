@@ -1,0 +1,12 @@
+{
+	"themes" : [
+		{
+			"id": "main",
+			"painter": "main_theme/painter.qml"
+		},
+		{
+			"id": "second",
+			"painter": "second_theme/painter.qml"
+		}
+	]
+}
