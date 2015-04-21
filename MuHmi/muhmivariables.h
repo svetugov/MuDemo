@@ -21,6 +21,7 @@ protected:
     virtual HmiStateMachine::State *modulesRootState() const Q_DECL_OVERRIDE;
     virtual HmiBase::HmiModuleId initialModuleId() const Q_DECL_OVERRIDE;
     virtual QString themesFolder() const Q_DECL_OVERRIDE;
+    virtual QString importFolder() const Q_DECL_OVERRIDE;
 };
 
 #endif // MUHMIVARIABLES_H

@@ -55,3 +55,8 @@ QString MuHmiVariables::themesFolder() const
 {
     return QString(QStringLiteral(BUILD_ROOT_DIR) + "/themes/");
 }
+
+QString MuHmiVariables::importFolder() const
+{
+    return QString(QStringLiteral(BUILD_ROOT_DIR) + "/imports");
+}

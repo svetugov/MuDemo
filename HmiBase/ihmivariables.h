@@ -27,6 +27,7 @@ protected:
     virtual HmiStateMachine::State *modulesRootState() const = 0;
     virtual HmiModuleId initialModuleId() const = 0;
     virtual QString themesFolder() const = 0;
+    virtual QString importFolder() const = 0;
 
     friend class MainApplication;
 };

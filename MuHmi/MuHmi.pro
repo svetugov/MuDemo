@@ -11,6 +11,11 @@ INCLUDEPATH += $$srcRootDir/HmiStateMachine
 INCLUDEPATH += $$srcRootDir/HmiGui
 LIBS += -L$$buildLibDir -lHmiBase -lHmiStateMachine
 
+# Imports
+QML2_IMPORT_PATH += "$$buildRootDir/imports"
+# For QtCreator
+QML_IMPORT_PATH += "$$srcRootDir/HmiGui/imports"
+
 # Installation path
 DESTDIR = $$buildBinDir
 target.path = $$buildBinDir

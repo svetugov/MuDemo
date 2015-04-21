@@ -1,6 +1,6 @@
 TEMPLATE = lib
 TARGET = HmiGui
-QT += quick
+QT += qml quick
 
 # Dependencies
 INCLUDEPATH += $$PWD
@@ -8,10 +8,12 @@ INCLUDEPATH += $$PWD
 # Installation path
 DESTDIR = $$buildLibDir
 target.path = $$buildLibDir
-INSTALLS += target
+
+import.files = imports/*
+import.path = $$buildRootDir/imports
+INSTALLS += target import
 
 # Environment variables for source code
-DEFINES += BUILD_ROOT_DIR=\\\"$$buildRootDir\\\"
 DEFINES += HMIGUI_LIBRARY
 
 
@@ -38,4 +40,6 @@ SOURCES += \
     tools.cpp \
     environment.cpp
 
-DISTFILES +=
+DISTFILES += \
+    imports/HmiGui/Controls/AnimatedTransition.qml \
+    imports/HmiGui/Controls/qmldir
