@@ -1,0 +1,14 @@
+{
+	"id": "second",
+	"painter": "painter.qml",
+    "animations": [
+        {
+			"name": "homeAppearAnimation",
+			"file": "animations/HomeAppearAnimation.qml"
+        },
+		{
+			"name": "homeDisappearAnimation",
+			"file": "animations/HomeDisappearAnimation.qml"
+        }
+    ]
+}

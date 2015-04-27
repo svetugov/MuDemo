@@ -2,7 +2,6 @@
 #define MUHMIVARIABLES_H
 
 #include "ihmivariables.h"
-#include "themescollection.h"
 
 class MuHmiVariables : public QObject, public HmiBase::IHmiVariables
 {

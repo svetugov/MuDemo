@@ -7,10 +7,13 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQmlComponent>
+#include <QUrl>
 
 #include "thememanager.h"
 #include "theme.h"
 #include "painter.h"
+#include "tools.h"
+#include "environment.h"
 
 using namespace HmiGui;
 
@@ -20,6 +23,7 @@ ThemeManager::ThemeManager(QQmlEngine *engine, QQmlContext *context, QObject *pa
     , m_themesCollection()
     , m_engine(engine)
     , m_context(context)
+    , m_themesRootFolder("")
 {
 
 }
@@ -29,84 +33,39 @@ ThemeManager::~ThemeManager()
 
 }
 
-QString ThemeManager::currentTheme() const
-{
-    return m_currentTheme;
-}
-
-void ThemeManager::setCurrentTheme(const QString theme)
-{
-    if (m_currentTheme != theme) {
-        m_currentTheme = theme;
-        emit currentThemeChanged(m_currentTheme);
-    }
-}
-
 void ThemeManager::collectThemes(const QString &jsonPath,
                                  const QString &themesRootFolder)
 {
-    // Reading json file and convert it to json document
-    QFile file(QDir::toNativeSeparators(jsonPath));
-    if (!file.exists()) {
-        qWarning() << Q_FUNC_INFO << "JSON file doesn't exist:" + jsonPath;
-        return;
-    }
-    if (!file.open(QFile::ReadOnly)) {
-        qWarning() << Q_FUNC_INFO << "Cannot read JSON file:" + jsonPath;
-        return;
-    }
-
-    const QByteArray jsonData(file.readAll());
-    QJsonParseError jsonParseError;
-    const QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonData, &jsonParseError));
-
-    if (jsonParseError.error != QJsonParseError::NoError) {
-        qWarning() << Q_FUNC_INFO << "JSON file" << jsonPath << "failed to load with error:" << jsonParseError.error;
-        return;
-    }
-
-    // Finding themes in json document
-    QJsonObject jsonObject = jsonDoc.object();
-    const QString KEY_THEMES = QLatin1String("themes");
-
-    QJsonObject::const_iterator objectsIt = jsonObject.find(KEY_THEMES);
-    if (objectsIt != jsonObject.end()) {
-        const QJsonArray themes = objectsIt.value().toArray();
-        QJsonArray::const_iterator themesIt;
-        int themeObjectIndex = 0;
-        for (themesIt = themes.begin(); themesIt != themes.end(); ++themesIt) {
-            const QJsonObject theme = (*themesIt).toObject();
-
-            // Retrieve theme "id"
-            const QString KEY_ID = QLatin1String("id");
-            objectsIt = theme.find(KEY_ID);
-            if (objectsIt != theme.end()) {
-                QString id = objectsIt.value().toString();
-                if (id.isEmpty()) {
-                    qWarning() << Q_FUNC_INFO << "Theme number" << themeObjectIndex << "has empty id";
-                    continue;
+    QJsonDocument jsonDoc;
+    if (Tools::generateJsonDocument(jsonPath, jsonDoc)) {
+    // Searching "themes" array in json document
+    QJsonObject fullDocument = jsonDoc.object();
+    QJsonValue themesArrayValue;
+    if (Tools::findJsonValue("themes", fullDocument, themesArrayValue)) {
+        const QJsonArray themesArray = themesArrayValue.toArray();
+        // Searching "id" and "descriptor" for each theme in array
+        int index = 0;
+        QJsonArray::const_iterator arrayIt;
+        for (arrayIt = themesArray.begin(); arrayIt != themesArray.end(); ++arrayIt) {
+            QJsonValue idValue;
+            if (Tools::findJsonValue("id", (*arrayIt).toObject(), idValue)) {
+                QJsonValue descriptorValue;
+                if (Tools::findJsonValue("descriptor", (*arrayIt).toObject(), descriptorValue)) {
+                    Theme *theme = new Theme(idValue.toString(), QUrl(themesRootFolder + descriptorValue.toString()));
+                    m_themesCollection.insert(theme->id, theme);
+                    qDebug() << "Theme" << theme->id << "added to collection.";
                 }
-
-                // Retrieve theme painter
-                const QString KEY_PAINTER = QLatin1Literal("painter");
-                objectsIt = theme.find(KEY_PAINTER);
-                if (objectsIt != theme.end()) {
-                    QString painter = objectsIt.value().toString();
-                    if (painter.isEmpty()) {
-                        qWarning() << Q_FUNC_INFO << "Theme number" << themeObjectIndex << "has empty file path";
-                        continue;
-                    }
-
-                    // Create theme and put it to themes collection
-                    const QUrl painterUrl = QUrl::fromLocalFile(themesRootFolder + painter);
-                    Theme *theme = new Theme(id, painterUrl);
-                    if (!m_themesCollection.contains(id))
-                        m_themesCollection.insert(id, theme);
-                    qDebug() << "Theme with id" << id << "added to collection";
-                }
+                else
+                    qWarning() << Q_FUNC_INFO << "Failed to find 'descriptor' in theme number:" << index;
             }
-            themeObjectIndex++;
+            else
+                qWarning() << Q_FUNC_INFO << "Failed to find 'id' in theme number:" << index;
+
+            index++;
         }
+    }
+    else
+        qWarning() << Q_FUNC_INFO << "Failed to find 'themes' array.";
     }
 }
 
@@ -119,42 +78,105 @@ void ThemeManager::changeTheme(const QString &theme)
 
     Theme* themeObj = m_themesCollection.value(theme);
     if (!themeObj) {
-        qWarning() << Q_FUNC_INFO << "No such theme:" << theme;
+        qWarning() << Q_FUNC_INFO << "Theme" << theme << "failed to load. No such theme:";
         return;
     }
 
     if (loadTheme(theme))
         activateTheme(theme);
     else
-        qWarning() << Q_FUNC_INFO << "Unable to load theme:" << theme << "Error:" << themeObj->errorString;
+        qWarning() << Q_FUNC_INFO << "Theme" << theme << "failed to load. Error:" << themeObj->errorString;
 }
 
-bool ThemeManager::loadTheme(const QString &theme)
+bool ThemeManager::loadTheme(const QString &themeName)
 {
-    Theme *themeObj = m_themesCollection.value(theme);
-    if (themeObj->ready)
+    Theme *theme = m_themesCollection.value(themeName);
+    if (theme->ready)
         return true;
 
-    QQmlComponent component(m_engine, themeObj->url, this);
-    if (component.isReady()) {
-        Painter* painter = qobject_cast<Painter*>(component.create(m_context));
-        if (!painter)
-            return false;
+    // Parsing json file with theme info
+    QJsonDocument fullDoc;
+    if (!Tools::generateJsonDocument(theme->descriptorUrl.toString(), fullDoc))
+        return false;
 
-        qDebug() << "Successfully loaded theme:" << theme;
-        themeObj->ready = true;
-        themeObj->painter = painter;
-        return true;
-    }
-    else {
-        themeObj->errorString = component.errorString();
+    QJsonValue idValue;
+    if (!Tools::findJsonValue("id", fullDoc.object(), idValue)) {
+        qWarning() << Q_FUNC_INFO << "Theme" << themeName << "failed to load. No 'id' in JSON.";
         return false;
     }
+    if (idValue.toString() != theme->id) {
+        qWarning() << Q_FUNC_INFO << "Theme" << themeName << "failed to load. 'id' has wrong name in JSON.";
+        return false;
+    }
+
+    QJsonValue painterValue;
+    if (!Tools::findJsonValue("painter", fullDoc.object(), painterValue)) {
+        qWarning() << Q_FUNC_INFO << "Theme" << themeName << "failed to load. No 'painter' in JSON.";
+        return false;
+    }
+
+    // Basic info collected. Now we can load theme.
+    // Load Painter
+    const QString themeFolder = theme->descriptorUrl.toString(QUrl::RemoveFilename);
+    QQmlComponent component(m_engine, themeFolder + painterValue.toString(), this);
+    if (!component.isReady()) {
+        theme->errorString = component.errorString();
+        qWarning() << Q_FUNC_INFO << "Theme" << themeName << "failed to load. Cannot load painter /"
+                                                             "with error:" << theme->errorString;
+        return false;
+    }
+
+    Painter* painter = qobject_cast<Painter*>(component.create(m_context));
+    if (!painter) {
+        qWarning() << Q_FUNC_INFO << "Theme" << themeName << "failed to load. Cannot load painter.";
+        return false;
+    }
+
+    theme->ready = true;
+    theme->painter = painter;
+
+    // Theme loaded. Collect theme's animations.
+    QJsonValue animationsValue;
+    if (Tools::findJsonValue("animations", fullDoc.object(), animationsValue)) {
+        QJsonArray animationsArray = animationsValue.toArray();
+        QJsonArray::const_iterator arrayIt;
+        int index = 0;
+        for (arrayIt = animationsArray.begin(); arrayIt != animationsArray.end(); ++arrayIt) {
+            QJsonValue nameValue;
+            if (Tools::findJsonValue("name", (*arrayIt).toObject(), nameValue)) {
+                QJsonValue fileValue;
+                if (Tools::findJsonValue("file", (*arrayIt).toObject(), fileValue)) {
+                    const QUrl url = QUrl::fromLocalFile(themeFolder + fileValue.toString());
+                    theme->animationsCollection.insert(nameValue.toString(), url);
+                }
+            }
+            index++;
+        }
+    }
+
+    qDebug() << "Theme" << themeName << "successfully loaded.";
+    return true;
 }
 
 void ThemeManager::activateTheme(const QString &theme)
 {
     m_context->setContextProperty("painter", m_themesCollection.value(theme)->painter);
     m_currentTheme = theme;
-    qDebug() << theme << "theme activated.";
+    qDebug() << "Theme" << theme << "activated.";
 }
+
+QObject* ThemeManager::animation(const QString &name)
+{
+    QUrl url = m_themesCollection.value(m_currentTheme)->animationsCollection.value(name);
+    QQmlComponent component(m_engine, url);
+    if (component.isReady()) {
+        return component.create(m_context);
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << "Animation" << name << "failed to load with error:"
+                   << component.errorString();
+        return 0;
+    }
+}
+
+

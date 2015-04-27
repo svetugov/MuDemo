@@ -4,32 +4,37 @@
 #include <QObject>
 #include <QString>
 #include <QUrl>
+#include <QHash>
 
 #include "hmigui_global.h"
 #include "painter.h"
 
 namespace HmiGui {
+typedef QHash<QString, QUrl> AnimationsCollection;
 
 struct Theme
 {
     QString id;
-    QUrl url;
+    QUrl descriptorUrl;
+    Painter *painter;
+    AnimationsCollection animationsCollection;
     bool ready;
     QString errorString;
-    Painter* painter;
 
-    Theme(QString id,
-          QUrl url,
-          bool ready = false,
-          QString errorString = "",
-          Painter* painter = 0) :
-        id(id),
-        url(url),
-        ready(ready),
-        errorString(errorString),
-        painter(painter)
+    Theme( QString id
+           ,QUrl descriptorUrl
+           ) :
+        id(id)
+      ,descriptorUrl(descriptorUrl)
+      ,painter(0)
+      ,animationsCollection()
+      ,ready(false)
+      ,errorString("")
     {}
 };
 
+
+typedef QHash<QString, Theme*> ThemesCollection;
 }
+
 #endif // THEME_H

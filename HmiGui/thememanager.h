@@ -8,6 +8,7 @@
 
 class QQmlEngine;
 class QQmlContext;
+class QJsonObject;
 
 namespace HmiGui {
 
@@ -21,23 +22,19 @@ public:
 
     void collectThemes(const QString &jsonPath, const QString &themesRootFolder);
 
-    QString currentTheme() const;
-    void setCurrentTheme(const QString theme);
-
 public slots:
     void changeTheme(const QString &theme);
-
-signals:
-    void currentThemeChanged(QString theme);
+    QObject* animation(const QString &name);
 
 private:
-    bool loadTheme(const QString &theme);
+    bool loadTheme(const QString &themeName);
     void activateTheme(const QString &theme);
 
     QString m_currentTheme;
     ThemesCollection m_themesCollection;
     QQmlEngine *m_engine;
     QQmlContext *m_context;
+    QString m_themesRootFolder;
 
 };
 

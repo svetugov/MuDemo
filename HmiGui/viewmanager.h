@@ -32,6 +32,7 @@ private slots:
 private:
     void loadView(const ViewId &id);
     View* getViewFromCollection(const ViewId &id);
+    void activateViewItem(QQuickItem *item);
 
     QQmlEngine* m_qmlEngine;
     QQuickItem* m_rootItem;

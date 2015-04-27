@@ -1,10 +1,12 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
+import HmiGui.Controls 1.0
 
-
-Item {
+AnimatedItem {
     width: 800
     height: 480
+    appearAnimationId: "homeAppearAnimation"
+    disappearAnimationId: "homeDisappearAnimation"
 
     Image {
         source: painter.image("home_bg")
@@ -34,4 +36,5 @@ Item {
     }
 
     }
+
 }

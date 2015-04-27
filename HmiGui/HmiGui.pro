@@ -29,7 +29,8 @@ HEADERS += \
     theme.h \
     themescollection.h \
     tools.h \
-    environment.h
+    environment.h \
+    animationmanager.h
 
 SOURCES += \
     viewloader.cpp \
@@ -38,8 +39,11 @@ SOURCES += \
     painter.cpp \
     thememanager.cpp \
     tools.cpp \
-    environment.cpp
+    environment.cpp \
+    animationmanager.cpp
 
 DISTFILES += \
     imports/HmiGui/Controls/AnimatedTransition.qml \
-    imports/HmiGui/Controls/qmldir
+    imports/HmiGui/Controls/qmldir \
+    AnimatedItem.qml \
+    imports/HmiGui/Controls/AnimatedItem.qml

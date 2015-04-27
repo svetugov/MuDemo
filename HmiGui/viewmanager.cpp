@@ -27,7 +27,7 @@ View* ViewManager::getViewFromCollection(const ViewId &id)
 {
     QHash<ViewId, View*>::const_iterator it = m_viewsCollection.find(id);
     if (it == m_viewsCollection.end()) {
-        qCritical() << Q_FUNC_INFO << "There is no such view in the collection:" << id;
+        qWarning() << Q_FUNC_INFO << "There is no such view in the collection:" << id;
         return 0;
     }
     else
@@ -41,7 +41,7 @@ void ViewManager::showView(const ViewId &id)
         m_viewToShow = id;
         if (view->status == View::ViewStatusReady) {
             QQuickItem* item = view->item;
-            item->setVisible(true);
+            activateViewItem(item);
             m_topView = id;
         }
         else
@@ -54,7 +54,8 @@ void ViewManager::hideView(const ViewId &id)
     View* view = getViewFromCollection(id);
     if (view) {
         QQuickItem* item = view->item;
-        item->setVisible(false);
+        if (!QMetaObject::invokeMethod(item, "hide"))
+            item->setVisible(false);
     }
 }
 
@@ -77,15 +78,20 @@ void ViewManager::viewLoadingComplete(const ViewId &id)
         item->setParentItem(m_rootItem);
 
         if (m_viewToShow == id) {
-            item->setVisible(true);
+            activateViewItem(item);
             m_topView = id;
         }
     }
     else {
-        qCritical() << Q_FUNC_INFO << "view ["<<id<<"] failed to load. Error:" << view->errorString;
+        qWarning() << Q_FUNC_INFO << "view ["<<id<<"] failed to load. Error:" << view->errorString;
     }
 }
 
+void ViewManager::activateViewItem(QQuickItem *item)
+{
+    if (!QMetaObject::invokeMethod(item, "show"))
+        item->setVisible(true);
+}
 
 // View path will be "viewsRootFolder/path" where "path" taken from json.
 void ViewManager::collectModuleViewsFromJson(const QString &moduleName,
@@ -95,11 +101,11 @@ void ViewManager::collectModuleViewsFromJson(const QString &moduleName,
     // Reading json file and convert it to json document
     QFile file(QDir::toNativeSeparators(jsonPath));
     if (!file.exists()) {
-        qCritical() << "JSON file doesn't exist:" + jsonPath;
+        qWarning() << "JSON file doesn't exist:" + jsonPath;
         return;
     }
     if (!file.open(QFile::ReadOnly)) {
-        qCritical() << "Cannot read JSON file:" + jsonPath;
+        qWarning() << "Cannot read JSON file:" + jsonPath;
         return;
     }
 
@@ -108,7 +114,7 @@ void ViewManager::collectModuleViewsFromJson(const QString &moduleName,
     const QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonData, &jsonParseError));
 
     if (jsonParseError.error != QJsonParseError::NoError) {
-        qCritical() << "JSON file" << jsonPath << "failed to load with error:" << jsonParseError.error;
+        qWarning() << "JSON file" << jsonPath << "failed to load with error:" << jsonParseError.error;
         return;
     }
 
@@ -130,7 +136,7 @@ void ViewManager::collectModuleViewsFromJson(const QString &moduleName,
             if (objectsIt != view.end()) {
                 ViewId id = objectsIt.value().toString();
                 if (id.isEmpty()) {
-                    qCritical() << "View number" << viewObjectIndex << "has empty id";
+                    qWarning() << "View number" << viewObjectIndex << "has empty id";
                     continue;
                 }
 
@@ -140,7 +146,7 @@ void ViewManager::collectModuleViewsFromJson(const QString &moduleName,
                 if (objectsIt != view.end()) {
                     QString filePath = objectsIt.value().toString();
                     if (filePath.isEmpty()) {
-                        qCritical() << "View number" << viewObjectIndex << "has empty file path";
+                        qWarning() << "View number" << viewObjectIndex << "has empty file path";
                         continue;
                     }
 
@@ -149,7 +155,7 @@ void ViewManager::collectModuleViewsFromJson(const QString &moduleName,
                 View *view = new View(id, fileUrl, moduleName);
                 if (!m_viewsCollection.contains(id))
                     m_viewsCollection.insert(id, view);
-                    qCritical() << "View with id" << id << "added to collection";
+                    qDebug() << "View with id" << id << "added to collection";
                 }
             }
             viewObjectIndex++;

@@ -2,11 +2,11 @@
 	"themes" : [
 		{
 			"id": "main",
-			"painter": "main_theme/painter.qml"
+			"descriptor": "main_theme/descriptor.json"
 		},
 		{
 			"id": "second",
-			"painter": "second_theme/painter.qml"
+			"descriptor": "second_theme/descriptor.json"
 		}
 	]
 }

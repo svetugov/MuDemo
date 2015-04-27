@@ -5,7 +5,6 @@
 
 #include "hmibase_global.h"
 #include "hmimoduleid.h"
-#include "themescollection.h"
 
 namespace HmiStateMachine {
 class State;

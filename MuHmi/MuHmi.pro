@@ -38,3 +38,13 @@ SOURCES += main.cpp \
 
 HEADERS += \
     muhmivariables.h
+
+DISTFILES += \
+    themes/main_theme/painter.qml \
+    themes/second_theme/painter.qml \
+    themes/themesDescriptor.json \
+    themes/main_theme/animations/HomeAppearAnimation.qml \
+    themes/main_theme/animationDescriptor.json \
+    themes/main_theme/descriptor.json \
+    themes/second_theme/descriptor.json \
+    themes/second_theme/animations/HomeAppearAnimation.qml
