@@ -25,10 +25,10 @@ HmiStateMachine::State* HomeMain::createApplicationStateTree(HmiStateMachine::St
     m_rootState = new HmiStateMachine::State("homeRoot", parentState);
     HmiStateMachine::ViewState* homeViewState = new HmiStateMachine::ViewState("HomeMain", m_rootState);
 
-    HmiStateMachine::ViewState* appGridState = new HmiStateMachine::ViewState("HomeGrid", m_rootState);
-    HmiStateMachine::EventualTransition * appGridTransition = new HmiStateMachine::EventualTransition(HomeTransitions::ShowFameHall,
-                                                                                                      m_rootState);
-    appGridTransition->setTargetState(appGridState);
+    HmiStateMachine::ViewState* fameHallState = new HmiStateMachine::ViewState("FameHall", m_rootState);
+    HmiStateMachine::EventualTransition * fameHallTransition =
+            new HmiStateMachine::EventualTransition(HomeTransitions::ShowFameHall, m_rootState);
+    fameHallTransition->setTargetState(fameHallState);
 
     m_rootState->setInitialState(homeViewState);
 

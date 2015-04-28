@@ -6,7 +6,6 @@ AnimatedItem {
     width: 800
     height: 480
     appearAnimationId: "homeAppearAnimation"
-    disappearAnimationId: "homeDisappearAnimation"
 
     Image {
         source: painter.image("home_bg")

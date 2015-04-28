@@ -6,9 +6,9 @@
 			"name": "homeAppearAnimation",
 			"file": "animations/HomeAppearAnimation.qml"
         },
-		{
-			"name": "homeDisappearAnimation",
-			"file": "animations/HomeDisappearAnimation.qml"
+        {
+            "name": "generalAppearAnimation",
+            "file": "animations/GeneralAppearAnimation.qml"
         }
     ]
 }

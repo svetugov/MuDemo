@@ -5,8 +5,8 @@
             "file": "HmiHome/HomeMain.qml"
         },
         {
-            "id": "HomeGrid",
-            "file": "HmiHome/HomeGrid.qml"
+            "id": "FameHall",
+            "file": "HmiHome/HomeFameHall.qml"
         }
     ]
 }

@@ -25,13 +25,11 @@ SOURCES += \
     homemain.cpp \
     homecontroller.cpp
 
-QML_FILES += \
-    viewDescriptor.json \
-    qml/HomeMain.qml \
-    qml/HomeGrid.qml
-
-qml.files = $$QML_FILES
+qml.files = qml/*
 
 OTHER_FILES += \
         $$QML_FILES
+
+DISTFILES += \
+    qml/HomeFameHall.qml
 
