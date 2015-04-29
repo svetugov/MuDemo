@@ -10,6 +10,7 @@ INCLUDEPATH += ../../HmiGui
 
 
 # Installation path
+qml.files = qml/*
 qml.path = $$buildRootDir/qml/$$TARGET
 INSTALLS += qml
 
@@ -25,11 +26,9 @@ SOURCES += \
     homemain.cpp \
     homecontroller.cpp
 
-qml.files = qml/*
-
-OTHER_FILES += \
-        $$QML_FILES
 
 DISTFILES += \
-    qml/HomeFameHall.qml
+    qml/HomeFameHall.qml \
+    qml/HomeMain.qml \
+    qml/viewDescriptor.json
 

@@ -5,7 +5,7 @@ Item {
     property string appearAnimationId: ""
 
     function show() {
-        var animation = themeManager.animation(appearAnimationId);
+        var animation = themeManager.animation(appearAnimationId, root);
         root.visible = true;
         if (animation) {
             animation.target = root;

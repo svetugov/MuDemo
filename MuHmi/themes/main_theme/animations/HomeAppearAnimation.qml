@@ -6,9 +6,9 @@ AnimatedTransition {
     animation: SequentialAnimation {
         PropertyAnimation {
             target: root.target ? root.target : null
-            properties: "x"
-            from: root.target ? -root.target.width : 0
-            to: 0
+            properties: "opacity"
+            from: 0.1
+            to: 1
             duration: 1000
         }
     }

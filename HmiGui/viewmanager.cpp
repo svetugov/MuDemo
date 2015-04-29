@@ -75,7 +75,10 @@ void ViewManager::viewLoadingComplete(const ViewId &id)
     if (view && view->status == View::ViewStatusReady) {
         QQuickItem* item = view->item;
         item->setParent(this);
-        item->setParentItem(m_rootItem);
+        if (m_rootItem)
+            item->setParentItem(m_rootItem);
+        else
+            qWarning() << Q_FUNC_INFO << "Root item for ViewManager is not set.";
 
         if (m_viewToShow == id) {
             activateViewItem(item);

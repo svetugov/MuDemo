@@ -11,6 +11,7 @@
 
 namespace HmiGui {
 typedef QHash<QString, QUrl> AnimationsCollection;
+typedef QHash<QString, QUrl> StylesCollection;
 
 struct Theme
 {
@@ -18,6 +19,7 @@ struct Theme
     QUrl descriptorUrl;
     Painter *painter;
     AnimationsCollection animationsCollection;
+    StylesCollection stylesCollection;
     bool ready;
     QString errorString;
 
@@ -28,6 +30,7 @@ struct Theme
       ,descriptorUrl(descriptorUrl)
       ,painter(0)
       ,animationsCollection()
+      ,stylesCollection()
       ,ready(false)
       ,errorString("")
     {}

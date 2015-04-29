@@ -13,6 +13,7 @@
 #include "viewmanager.h"
 #include "thememanager.h"
 #include "environment.h"
+#include "settings.h"
 
 // State Machine
 #include "statemachine.h"
@@ -31,10 +32,6 @@ MainApplication::MainApplication(int &argc, char **argv, IHmiVariables *hmiVaria
     // Add import pathes
     m_quickView.engine()->addImportPath(m_hmiVariables->importFolder());
 
-    // Load root qml and show main window
-    QUrl rootQml = QUrl::fromLocalFile(m_hmiVariables->rootQmlPath());
-    m_quickView.setSource(rootQml.path());
-    m_quickView.show();
 
     // Themeing
     HmiGui::Environment::instance()->setThemesFolder(m_hmiVariables->themesFolder());
@@ -42,10 +39,16 @@ MainApplication::MainApplication(int &argc, char **argv, IHmiVariables *hmiVaria
     m_themeManager = new HmiGui::ThemeManager(m_quickView.engine(), m_quickView.rootContext(), this);
     m_themeManager->collectThemes(m_hmiVariables->themesFolder() + QLatin1Literal("themesDescriptor.json"),
                                   m_hmiVariables->themesFolder());
+
     // Set default theme
     m_themeManager->changeTheme("main");
     m_quickView.rootContext()->setContextProperty("themeManager", m_themeManager);
+    m_quickView.rootContext()->setContextProperty("applicationWindow", &m_quickView);
 
+    // Load root qml and show main window
+    QUrl rootQml = QUrl::fromLocalFile(m_hmiVariables->rootQmlPath());
+    m_quickView.setSource(rootQml.path());
+    m_quickView.show();
 
     // Create view manager
     m_viewManager = new HmiGui::ViewManager(m_quickView.engine(), m_quickView.rootObject(), this);

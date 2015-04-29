@@ -10,5 +10,11 @@
             "name": "generalAppearAnimation",
             "file": "animations/GeneralAppearAnimation.qml"
         }
+    ],
+    "styles": [
+        {
+            "name": "NativeStyle",
+            "file": "styles/NativeStyle.qml"
+        }
     ]
 }

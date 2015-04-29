@@ -154,6 +154,25 @@ bool ThemeManager::loadTheme(const QString &themeName)
         }
     }
 
+    // Collect styles
+    QJsonValue stylesValue;
+    if (Tools::findJsonValue("styles", fullDoc.object(), stylesValue)) {
+        QJsonArray stylesArray = stylesValue.toArray();
+        QJsonArray::const_iterator arrayIt;
+        int index = 0;
+        for (arrayIt = stylesArray.begin(); arrayIt != stylesArray.end(); ++arrayIt) {
+            QJsonValue nameValue;
+            if (Tools::findJsonValue("name", (*arrayIt).toObject(), nameValue)) {
+                QJsonValue fileValue;
+                if (Tools::findJsonValue("file", (*arrayIt).toObject(), fileValue)) {
+                    const QUrl url = QUrl::fromLocalFile(themeFolder + fileValue.toString());
+                    theme->stylesCollection.insert(nameValue.toString(), url);
+                }
+            }
+            index++;
+        }
+    }
+
     qDebug() << "Theme" << themeName << "successfully loaded.";
     return true;
 }
@@ -165,12 +184,14 @@ void ThemeManager::activateTheme(const QString &theme)
     qDebug() << "Theme" << theme << "activated.";
 }
 
-QObject* ThemeManager::animation(const QString &name)
+QObject* ThemeManager::animation(const QString &name, QObject *parent)
 {
     QUrl url = m_themesCollection.value(m_currentTheme)->animationsCollection.value(name);
     QQmlComponent component(m_engine, url);
     if (component.isReady()) {
-        return component.create(m_context);
+        QObject *result = component.create(m_context);
+        result->setParent(parent);
+        return result;
     }
     else {
         qWarning() << Q_FUNC_INFO << "Animation" << name << "failed to load with error:"
@@ -180,3 +201,18 @@ QObject* ThemeManager::animation(const QString &name)
 }
 
 
+QObject* ThemeManager::style(const QString &name, QObject *parent)
+{
+    QUrl url = m_themesCollection.value(m_currentTheme)->stylesCollection.value(name);
+    QQmlComponent component(m_engine, url);
+    if (component.isReady()) {
+        QObject *result = component.create(m_context);
+        result->setParent(parent);
+        return result;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << "Style" << name << "failed to load with error:"
+                   << component.errorString();
+        return 0;
+    }
+}

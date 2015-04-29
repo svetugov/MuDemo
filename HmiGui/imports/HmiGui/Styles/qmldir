@@ -1,0 +1,3 @@
+module HmiGui.Styles
+Style 1.0 Style.qml
+typeinfo styles.qmltypes

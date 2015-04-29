@@ -1,4 +1,5 @@
 module HmiGui.Controls
 AnimatedTransition 1.0 AnimatedTransition.qml
 AnimatedItem 1.0 AnimatedItem.qml
+View 1.0 View.qml
 typeinfo controls.qmltypes

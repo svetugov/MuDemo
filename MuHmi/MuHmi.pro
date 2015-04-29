@@ -49,4 +49,5 @@ DISTFILES += \
     themes/second_theme/descriptor.json \
     themes/second_theme/animations/HomeAppearAnimation.qml \
     themes/main_theme/animations/GeneralAppearAnimation.qml \
-    themes/second_theme/animations/GeneralAppearAnimation.qml
+    themes/second_theme/animations/GeneralAppearAnimation.qml \
+    themes/main_theme/styles/NativeStyle.qml

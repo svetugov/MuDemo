@@ -6,6 +6,7 @@
 
 #include "hmibase_global.h"
 #include "hmimoduleid.h"
+#include "settings.h"
 
 namespace HmiGui {
 class ViewManager;
@@ -25,7 +26,6 @@ class HMIBASE_EXPORT MainApplication : public QGuiApplication
 public:
     explicit MainApplication(int &argc, char **argv, IHmiVariables *hmiVariables);
     virtual ~MainApplication() {}
-
 
 private:
     void loadHmiModules();

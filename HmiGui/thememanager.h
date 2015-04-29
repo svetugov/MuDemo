@@ -24,7 +24,8 @@ public:
 
 public slots:
     void changeTheme(const QString &theme);
-    QObject* animation(const QString &name);
+    QObject* animation(const QString &name, QObject *parent);
+    QObject* style(const QString &name, QObject *parent);
 
 private:
     bool loadTheme(const QString &themeName);

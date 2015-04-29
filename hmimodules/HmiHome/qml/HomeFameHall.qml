@@ -7,9 +7,9 @@ AnimatedItem {
     height: 480
     appearAnimationId: "generalAppearAnimation"
 
-    Image {
-        source: painter.image("general_bg")
-    }
+//    Image {
+//        source: painter.image("general_bg")
+//    }
 
     Button {
         text: "Back"
